@@ -1,0 +1,220 @@
+===============================================================================
+ QUICK START - TESTE LOCAL NO UBUNTU
+===============================================================================
+
+Seu hardware: Intel i5 + RTX 3050 + Ubuntu
+Status: Servidor PARCODE indisponível - testando LOCALMENTE
+
+===============================================================================
+INÍCIO RÁPIDO (5 MINUTOS)
+===============================================================================
+
+1. ABRIR TERMINAL e navegar para a pasta do projeto:
+   
+   cd ~/projects/tp_paralela
+   # OU onde você colocou os arquivos
+
+2. VERIFICAR se está tudo certo:
+   
+   ./verify_setup.sh
+
+3. SE DER ERRO DE DEPENDÊNCIAS, instalar:
+   
+   sudo apt update
+   sudo apt install build-essential openmpi-bin libopenmpi-dev wget
+
+4. BAIXAR o dataset MNIST:
+   
+   ./download_mnist.sh
+   # Deve criar o arquivo mnist_train.csv (~109MB)
+
+5. COMPILAR tudo:
+   
+   make all
+   # Deve criar: kmeans_seq, kmeans_omp, kmeans_hybrid
+
+6. TESTE RÁPIDO (30 segundos):
+   
+   ./kmeans_seq mnist_train.csv 3 5
+
+   Se funcionar, você verá:
+   Loading data...
+   Loaded 60000 points...
+   K-Means finished in X iterations.
+   Elapsed time: X.XXX seconds
+
+7. EXECUTAR TODOS OS TESTES (5-10 minutos):
+   
+   ./run_tests_local.sh
+   
+   # Vai testar todas as configurações e salvar resultados
+
+8. ANALISAR RESULTADOS:
+   
+   cat resultados_local_*.txt
+   
+   # Procure por "Elapsed time" em cada teste
+
+===============================================================================
+ ARQUIVOS INCLUÍDOS
+===============================================================================
+
+Códigos Fonte:
+  ✓ kmeans_sequential.cpp  - Versão sequencial (baseline)
+  ✓ kmeans_omp.cpp          - Versão OpenMP  
+  ✓ kmeans_hybrid.cpp       - Versão MPI+OpenMP
+
+Documentação:
+  ✓ README.txt              - Documentação completa
+  ✓ GUIA_TESTE_LOCAL.txt    - Guia detalhado de teste local (LEIA!)
+  ✓ Makefile                - Compilação automática
+
+Scripts:
+  ✓ verify_setup.sh         - Verificar ambiente
+  ✓ download_mnist.sh       - Baixar dataset MNIST
+  ✓ run_tests_local.sh      - Executar todos os testes (LOCAL)
+  ✓ run_tests.sh            - Executar testes (para PARCODE)
+
+===============================================================================
+ COMANDOS IMPORTANTES
+===============================================================================
+
+COMPILAÇÃO:
+  make all      # Compilar tudo
+  make seq      # Apenas sequencial
+  make omp      # Apenas OpenMP
+  make hybrid   # Apenas híbrido
+  make clean    # Limpar executáveis
+
+EXECUÇÃO MANUAL:
+  # Sequencial
+  ./kmeans_seq mnist_train.csv 10 20
+
+  # OpenMP com 4 threads
+  export OMP_NUM_THREADS=4
+  ./kmeans_omp mnist_train.csv 10 20
+
+  # Híbrido: 2 processos × 2 threads
+  export OMP_NUM_THREADS=2
+  mpirun -np 2 ./kmeans_hybrid mnist_train.csv 10 20
+
+PARÂMETROS:
+  - mnist_train.csv: arquivo de dados
+  - 10: número de clusters (K)
+  - 20: máximo de iterações
+
+===============================================================================
+SEU HARDWARE
+===============================================================================
+
+Para ver informações da sua CPU:
+
+lscpu | grep -E "Model|CPU\(s\)|Core|Thread"
+
+Seu i5 provavelmente tem:
+- 6 cores físicos
+- 12 threads lógicos (com hyperthreading)
+- RTX 3050 (não usado neste projeto)
+
+Você pode testar com: 1, 2, 4, 6, 8, 12 threads
+
+===============================================================================
+📊 APÓS OS TESTES
+===============================================================================
+
+1. ABRA o arquivo de resultados:
+   
+   gedit resultados_local_*.txt
+   # ou: cat resultados_local_*.txt
+
+2. ANOTE os tempos de cada configuração
+
+3. CALCULE os speedups:
+   
+   Speedup = Tempo_Sequencial / Tempo_Paralelo
+   
+   Exemplo:
+   - Sequencial: 15.5s
+   - OpenMP 4 threads: 4.2s
+   - Speedup: 15.5 / 4.2 = 3.69x
+
+4. ATUALIZE os arquivos .cpp:
+   
+   Abra kmeans_omp.cpp e kmeans_hybrid.cpp
+   Procure por "[A PREENCHER]"
+   Substitua pelos seus tempos medidos
+   
+   IMPORTANTE: Mencione que foi testado em MÁQUINA LOCAL!
+
+5. OPCIONAL: Criar gráficos no Excel/LibreOffice
+
+===============================================================================
+ IMPORTANTE
+===============================================================================
+
+SOBRE O SERVIDOR PARCODE:
+✗ Servidor PARCODE não está disponível
+✓ Você pode fazer tudo localmente no seu Ubuntu
+✓ Documente que os testes foram feitos em MÁQUINA LOCAL
+✓ Especifique seu hardware (Intel i5, quantos cores, etc.)
+
+PARA O TRABALHO FINAL:
+- Use seus tempos locais
+- Explique no relatório que PARCODE não estava disponível
+- Documente seu hardware nos comentários dos .cpp
+- Mantenha todos os comentários explicando as mudanças
+
+SE PARCODE VOLTAR:
+- Execute os mesmos testes lá
+- Use os tempos do PARCODE na versão final
+- Compare com seus resultados locais (opcional)
+
+===============================================================================
+ PROBLEMAS COMUNS
+===============================================================================
+
+PROBLEMA: "mpirun: command not found"
+SOLUÇÃO: sudo apt install openmpi-bin libopenmpi-dev
+
+PROBLEMA: "Cannot open file: mnist_train.csv"  
+SOLUÇÃO: ./download_mnist.sh
+
+PROBLEMA: "Permission denied" ao executar scripts
+SOLUÇÃO: chmod +x *.sh
+
+PROBLEMA: Testes muito rápidos (< 5 segundos)
+SOLUÇÃO: Edite run_tests_local.sh e mude MAX_ITER de 20 para 40
+
+PROBLEMA: "g++: error: unrecognized command line option '-fopenmp'"
+SOLUÇÃO: sudo apt install g++-11
+
+===============================================================================
+LEIA TAMBÉM
+===============================================================================
+
+Para informações DETALHADAS:
+→ GUIA_TESTE_LOCAL.txt  (Guia completo de teste local)
+→ README.txt            (Documentação geral do projeto)
+
+===============================================================================
+CHECKLIST
+===============================================================================
+
+Antes de executar os testes:
+□ Dependências instaladas (g++, mpicc, make)
+□ Dataset baixado (mnist_train.csv existe)
+□ Programas compilados (make all executado)
+□ verify_setup.sh passou sem erros
+
+Após executar os testes:
+□ Resultados salvos em resultados_local_*.txt
+□ Speedups calculados
+□ Tempos atualizados nos .cpp
+□ Hardware documentado nos comentários
+
+Para entrega final:
+□ kmeans_sequential.cpp
+□ kmeans_omp.cpp  
+□ kmeans_hybrid.cpp
+□ README.txt
+□ (Opcional) Gráficos de desempenho

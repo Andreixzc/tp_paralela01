@@ -1,0 +1,359 @@
+===============================================================================
+  GUIA DE TESTE LOCAL - UBUNTU
+===============================================================================
+
+Este guia explica como testar o projeto K-Means na sua máquina Ubuntu LOCAL,
+já que o servidor PARCODE não está disponível.
+
+===============================================================================
+PASSO 1: INSTALAR DEPENDÊNCIAS
+===============================================================================
+
+Abra o terminal e execute:
+
+sudo apt update
+sudo apt install build-essential openmpi-bin libopenmpi-dev wget
+
+Verificar instalação:
+g++ --version          # Deve mostrar versão 7.0+
+mpicc --version        # Deve mostrar versão do OpenMPI
+nproc                  # Mostra quantos cores você tem
+
+===============================================================================
+PASSO 2: VERIFICAR SEU HARDWARE
+===============================================================================
+
+Execute para ver informações da sua CPU:
+
+lscpu | grep -E "Model name|CPU\(s\)|Core|Thread"
+
+Exemplo de saída típica para i5:
+  Model name:            Intel(R) Core(TM) i5-XXXXX
+  CPU(s):                12          <- Threads lógicos (com hyperthreading)
+  Core(s) per socket:    6           <- Cores físicos
+  Thread(s) per core:    2           <- 2 = hyperthreading ativo
+
+O que isso significa:
+- 6 cores físicos × 2 threads = 12 threads lógicos totais
+- Você pode testar com até 12 threads
+- Melhor performance geralmente com até 6 threads (número de cores físicos)
+
+===============================================================================
+PASSO 3: PREPARAR OS ARQUIVOS DO PROJETO
+===============================================================================
+
+Estrutura de diretórios recomendada:
+
+~/projects/tp_paralela/
+├── kmeans_sequential.cpp
+├── kmeans_omp.cpp
+├── kmeans_hybrid.cpp
+├── README.txt
+├── Makefile
+├── download_mnist.sh
+├── run_tests_local.sh
+└── (mnist_train.csv será baixado)
+
+Navegue até o diretório:
+cd ~/projects/tp_paralela
+
+Dê permissão de execução aos scripts:
+chmod +x download_mnist.sh run_tests_local.sh
+
+===============================================================================
+PASSO 4: BAIXAR O DATASET MNIST
+===============================================================================
+
+Execute o script de download:
+./download_mnist.sh
+
+Se o download automático falhar, baixe manualmente:
+
+Opção 1 (Recomendada):
+1. Acesse: https://www.kaggle.com/datasets/oddrationale/mnist-in-csv
+2. Faça login no Kaggle (gratuito)
+3. Clique em "Download" (arquivo ZIP ~100MB)
+4. Extraia mnist_train.csv para ~/projects/tp_paralela/
+
+Opção 2 (Alternativa):
+1. Acesse: https://github.com/oddrationale/mnist_csv
+2. Download direto dos arquivos CSV
+
+Verificar se funcionou:
+ls -lh mnist_train.csv
+
+Deve mostrar arquivo ~109MB com 60001 linhas (1 header + 60000 dados)
+
+===============================================================================
+PASSO 5: COMPILAR TODOS OS PROGRAMAS
+===============================================================================
+
+Execute:
+make all
+
+Deve ver:
+✓ Versão sequencial compilada: ./kmeans_seq
+✓ Versão OpenMP compilada: ./kmeans_omp
+✓ Versão híbrida compilada: ./kmeans_hybrid
+
+Se der erro de MPI não encontrado:
+sudo apt install libopenmpi-dev openmpi-bin
+
+Verificar executáveis criados:
+ls -l kmeans_*
+
+===============================================================================
+PASSO 6: TESTE RÁPIDO (OPCIONAL)
+===============================================================================
+
+Antes de rodar todos os testes, faça um teste rápido:
+
+# Teste sequencial (deve levar ~5-15 segundos)
+./kmeans_seq mnist_train.csv 3 5
+
+# Teste OpenMP (deve ser mais rápido)
+export OMP_NUM_THREADS=4
+./kmeans_omp mnist_train.csv 3 5
+
+# Teste MPI (deve funcionar sem erros)
+export OMP_NUM_THREADS=2
+mpirun -np 2 ./kmeans_hybrid mnist_train.csv 3 5
+
+Se tudo funcionar, prossiga para os testes completos!
+
+===============================================================================
+PASSO 7: EXECUTAR TODOS OS TESTES
+===============================================================================
+
+Execute o script de testes automatizado:
+./run_tests_local.sh
+
+O script vai:
+1. Detectar automaticamente seu hardware
+2. Executar TODAS as configurações necessárias
+3. Salvar resultados em: resultados_local_YYYYMMDD_HHMMSS.txt
+4. Mostrar tempos na tela
+
+ATENÇÃO: Isso vai demorar alguns minutos! (~5-10 minutos total)
+Não feche o terminal durante a execução.
+
+Configurações testadas:
+- 1 versão sequencial (baseline)
+- 5-7 versões OpenMP (1, 2, 4, 6, 8, 12 threads)
+- 5-7 versões híbridas MPI+OpenMP
+
+===============================================================================
+PASSO 8: ANALISAR OS RESULTADOS
+===============================================================================
+
+Abra o arquivo de resultados:
+cat resultados_local_*.txt
+
+Ou:
+gedit resultados_local_*.txt
+
+Procure por "Elapsed time" em cada teste.
+
+Exemplo de resultado:
+=== VERSÃO SEQUENCIAL ===
+Elapsed time: 15.234 seconds
+
+=== VERSÃO OPENMP - 4 THREADS ===
+Elapsed time: 4.567 seconds
+
+Calcule o speedup:
+Speedup = 15.234 / 4.567 = 3.33x
+
+Calcule a eficiência:
+Eficiência = 3.33 / 4 = 0.83 = 83%
+
+===============================================================================
+PASSO 9: ATUALIZAR OS ARQUIVOS .CPP COM OS TEMPOS
+===============================================================================
+
+Abra os arquivos:
+gedit kmeans_omp.cpp
+gedit kmeans_hybrid.cpp
+
+Procure por "[A PREENCHER]" no cabeçalho e preencha com seus tempos.
+
+Exemplo no kmeans_omp.cpp:
+
+Antes:
+// Sequencial:  [A PREENCHER] segundos
+// 1 thread:    [A PREENCHER] segundos
+// 2 threads:   [A PREENCHER] segundos
+
+Depois:
+// MÁQUINA LOCAL (Intel i5-12400F, 6 cores, 12 threads, Ubuntu 24.04):
+// Sequencial:  15.234 segundos
+// 1 thread:    15.198 segundos  (speedup: 1.00x)
+// 2 threads:   8.123 segundos   (speedup: 1.87x)
+// 4 threads:   4.567 segundos   (speedup: 3.33x)
+// 8 threads:   3.891 segundos   (speedup: 3.91x)
+
+IMPORTANTE: Especifique que os testes foram em MÁQUINA LOCAL, não no PARCODE!
+
+===============================================================================
+PASSO 10: CRIAR GRÁFICOS (OPCIONAL MAS RECOMENDADO)
+===============================================================================
+
+Para melhorar seu trabalho, crie gráficos de speedup:
+
+Opção 1 - Excel/LibreOffice:
+1. Copie os tempos para uma planilha
+2. Crie gráfico de linha: Threads vs Tempo
+3. Crie gráfico de linha: Threads vs Speedup
+
+Opção 2 - Python (se souber):
+import matplotlib.pyplot as plt
+threads = [1, 2, 4, 8]
+times = [15.2, 8.1, 4.6, 3.9]
+speedup = [15.2/t for t in times]
+
+plt.plot(threads, speedup)
+plt.xlabel('Número de Threads')
+plt.ylabel('Speedup')
+plt.title('K-Means Speedup - OpenMP')
+plt.savefig('speedup.png')
+
+===============================================================================
+DIFERENÇAS ENTRE SEU PC E O SERVIDOR PARCODE
+===============================================================================
+
+SERVIDOR PARCODE:
+- CPU: Intel 4 cores (sem info de modelo)
+- Sem hyperthreading (provavelmente)
+- Mais lento (hardware mais antigo)
+- Compartilhado (outros alunos usando)
+
+SEU PC (provavelmente):
+- CPU: Intel i5 (6+ cores)
+- COM hyperthreading (12 threads)
+- Mais rápido (hardware mais novo)
+- Exclusivo (só você usando)
+
+RESULTADO:
+- Seus tempos serão MAIS RÁPIDOS
+- Seus speedups podem ser MELHORES
+- Isso é OK! Documente qual hardware usou
+
+===============================================================================
+O QUE FAZER SE PARCODE VOLTAR A FUNCIONAR
+===============================================================================
+
+Se o servidor PARCODE voltar antes da entrega:
+
+1. Faça SSH para o PARCODE
+2. Copie os arquivos para lá:
+   scp *.cpp *.txt Makefile run_tests.sh mnist_train.csv \
+       a1277243@parcode.icei.pucminas.br:/home/a1277243/
+
+3. Execute: ./run_tests.sh
+4. Use os tempos do PARCODE na versão FINAL
+
+Se não voltar:
+- Use seus tempos locais
+- Documente claramente o hardware usado
+- Explique que PARCODE não estava disponível
+
+===============================================================================
+DICAS PARA MELHORAR OS RESULTADOS
+===============================================================================
+
+1. FECHE OUTROS PROGRAMAS durante os testes
+   - Navegadores (Chrome, Firefox)
+   - IDEs pesadas (VS Code, PyCharm)
+   - Jogos, vídeos, etc.
+
+2. CONECTE O LAPTOP NA TOMADA
+   - Modo bateria pode limitar CPU
+   - Use modo "Performance" se disponível
+
+3. DESATIVE LIMITADORES DE CPU:
+   # Ver frequência atual
+   cat /proc/cpuinfo | grep MHz
+   
+   # Configurar modo performance (requer root)
+   sudo cpupower frequency-set -g performance
+
+4. REPITA OS TESTES se os resultados variarem muito
+   - Execute run_tests_local.sh 2-3 vezes
+   - Use a média dos tempos
+
+5. SE MUITO RÁPIDO (< 10 segundos):
+   - Aumente max_iter de 20 para 30 ou 40
+   - Use K=15 ou K=20 em vez de K=10
+   
+   Edite o script:
+   gedit run_tests_local.sh
+   # Mude: MAX_ITER=20 para MAX_ITER=30
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+PROBLEMA: "Cannot open file: mnist_train.csv"
+SOLUÇÃO: 
+  cd ~/projects/tp_paralela
+  ls mnist_train.csv
+  Se não existir, execute: ./download_mnist.sh
+
+PROBLEMA: "mpirun: command not found"
+SOLUÇÃO: 
+  sudo apt install openmpi-bin libopenmpi-dev
+
+PROBLEMA: "-fopenmp: unrecognized option"
+SOLUÇÃO: 
+  Atualizar g++: sudo apt install g++-11
+  Verificar: g++ --version (deve ser 7.0+)
+
+PROBLEMA: "Permission denied"
+SOLUÇÃO: 
+  chmod +x run_tests_local.sh download_mnist.sh
+
+PROBLEMA: Tempos muito rápidos (< 3 segundos sequencial)
+SOLUÇÃO: 
+  Aumentar dificuldade:
+  - MAX_ITER=30 ou 40
+  - K=15 ou 20
+  - Ou usar mnist_test.csv + mnist_train.csv concatenados
+
+PROBLEMA: MPI dá erro "localhost slots=0"
+SOLUÇÃO:
+  echo "localhost slots=12" > ~/hostfile
+  mpirun --hostfile ~/hostfile -np 2 ./kmeans_hybrid mnist_train.csv 10 20
+
+PROBLEMA: CPU muito quente / throttling
+SOLUÇÃO:
+  - Limpar cooler do notebook
+  - Usar base refrigerada
+  - Reduzir número de testes simultâneos
+  - Esperar esfriar entre testes
+
+===============================================================================
+CHECKLIST FINAL ANTES DA ENTREGA
+===============================================================================
+
+□ Todos os arquivos .cpp compilam sem erros
+□ Todos os testes executam corretamente
+□ Tempos preenchidos nos cabeçalhos dos .cpp
+□ Comentários explicando mudanças estão presentes
+□ README.txt está atualizado com informações do hardware usado
+□ Speedups calculados e documentados
+□ (Opcional) Gráficos de desempenho criados
+□ Nome de todos do grupo está nos arquivos
+
+===============================================================================
+CONTATO E AJUDA
+===============================================================================
+
+Se tiver problemas:
+1. Revise este guia cuidadosamente
+2. Consulte o README.txt do projeto
+3. Pergunte para colegas do grupo
+4. Consulte o professor/monitor
+
+Boa sorte com o trabalho! 🚀
+
+===============================================================================

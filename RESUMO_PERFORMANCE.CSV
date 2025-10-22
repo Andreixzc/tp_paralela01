@@ -1,0 +1,9 @@
+Configuration,Processes,Threads_per_Process,Total_Workers,Time_seconds,Speedup,Efficiency_percent,Type
+Sequential,1,1,1,10.722,1.00,100.0,Baseline
+OpenMP 1 thread,1,1,1,10.618,1.01,101.0,OpenMP
+OpenMP 2 threads,1,2,2,5.471,1.96,98.0,OpenMP
+OpenMP 4 threads,1,4,4,3.380,3.17,79.3,OpenMP
+OpenMP 8 threads,1,8,8,3.409,3.15,39.3,OpenMP
+Hybrid 1×4,1,4,4,5.723,1.87,46.8,Hybrid
+Hybrid 2×2,2,2,4,2.964,3.62,90.5,Hybrid
+Hybrid 4×1,4,1,4,3.240,3.31,82.8,Hybrid
