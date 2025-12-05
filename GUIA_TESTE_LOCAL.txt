@@ -1,5 +1,5 @@
 ===============================================================================
-  GUIA DE TESTE LOCAL - UBUNTU
+GUIA DE TESTE LOCAL - UBUNTU
 ===============================================================================
 
 Este guia explica como testar o projeto K-Means na sua máquina Ubuntu LOCAL,
@@ -15,9 +15,9 @@ sudo apt update
 sudo apt install build-essential openmpi-bin libopenmpi-dev wget
 
 Verificar instalação:
-g++ --version          # Deve mostrar versão 7.0+
-mpicc --version        # Deve mostrar versão do OpenMPI
-nproc                  # Mostra quantos cores você tem
+g++ --version # Deve mostrar versão 7.0+
+mpicc --version # Deve mostrar versão do OpenMPI
+nproc # Mostra quantos cores você tem
 
 ===============================================================================
 PASSO 2: VERIFICAR SEU HARDWARE
@@ -28,10 +28,10 @@ Execute para ver informações da sua CPU:
 lscpu | grep -E "Model name|CPU\(s\)|Core|Thread"
 
 Exemplo de saída típica para i5:
-  Model name:            Intel(R) Core(TM) i5-XXXXX
-  CPU(s):                12          <- Threads lógicos (com hyperthreading)
-  Core(s) per socket:    6           <- Cores físicos
-  Thread(s) per core:    2           <- 2 = hyperthreading ativo
+Model name: Intel(R) Core(TM) i5-XXXXX
+CPU(s): 12 <- Threads lógicos (com hyperthreading)
+Core(s) per socket: 6 <- Cores físicos
+Thread(s) per core: 2 <- 2 = hyperthreading ativo
 
 O que isso significa:
 - 6 cores físicos × 2 threads = 12 threads lógicos totais
@@ -92,9 +92,9 @@ Execute:
 make all
 
 Deve ver:
-✓ Versão sequencial compilada: ./kmeans_seq
-✓ Versão OpenMP compilada: ./kmeans_omp
-✓ Versão híbrida compilada: ./kmeans_hybrid
+Versão sequencial compilada: ./kmeans_seq
+Versão OpenMP compilada: ./kmeans_omp
+Versão híbrida compilada: ./kmeans_hybrid
 
 Se der erro de MPI não encontrado:
 sudo apt install libopenmpi-dev openmpi-bin
@@ -180,17 +180,17 @@ Procure por "[A PREENCHER]" no cabeçalho e preencha com seus tempos.
 Exemplo no kmeans_omp.cpp:
 
 Antes:
-// Sequencial:  [A PREENCHER] segundos
-// 1 thread:    [A PREENCHER] segundos
-// 2 threads:   [A PREENCHER] segundos
+// Sequencial: [A PREENCHER] segundos
+// 1 thread: [A PREENCHER] segundos
+// 2 threads: [A PREENCHER] segundos
 
 Depois:
 // MÁQUINA LOCAL (Intel i5-12400F, 6 cores, 12 threads, Ubuntu 24.04):
-// Sequencial:  15.234 segundos
-// 1 thread:    15.198 segundos  (speedup: 1.00x)
-// 2 threads:   8.123 segundos   (speedup: 1.87x)
-// 4 threads:   4.567 segundos   (speedup: 3.33x)
-// 8 threads:   3.891 segundos   (speedup: 3.91x)
+// Sequencial: 15.234 segundos
+// 1 thread: 15.198 segundos (speedup: 1.00x)
+// 2 threads: 8.123 segundos (speedup: 1.87x)
+// 4 threads: 4.567 segundos (speedup: 3.33x)
+// 8 threads: 3.891 segundos (speedup: 3.91x)
 
 IMPORTANTE: Especifique que os testes foram em MÁQUINA LOCAL, não no PARCODE!
 
@@ -246,8 +246,8 @@ Se o servidor PARCODE voltar antes da entrega:
 
 1. Faça SSH para o PARCODE
 2. Copie os arquivos para lá:
-   scp *.cpp *.txt Makefile run_tests.sh mnist_train.csv \
-       a1277243@parcode.icei.pucminas.br:/home/a1277243/
+scp *.cpp *.txt Makefile run_tests.sh mnist_train.csv \
+a1277243@parcode.icei.pucminas.br:/home/a1277243/
 
 3. Execute: ./run_tests.sh
 4. Use os tempos do PARCODE na versão FINAL
@@ -262,32 +262,32 @@ DICAS PARA MELHORAR OS RESULTADOS
 ===============================================================================
 
 1. FECHE OUTROS PROGRAMAS durante os testes
-   - Navegadores (Chrome, Firefox)
-   - IDEs pesadas (VS Code, PyCharm)
-   - Jogos, vídeos, etc.
+- Navegadores (Chrome, Firefox)
+- IDEs pesadas (VS Code, PyCharm)
+- Jogos, vídeos, etc.
 
 2. CONECTE O LAPTOP NA TOMADA
-   - Modo bateria pode limitar CPU
-   - Use modo "Performance" se disponível
+- Modo bateria pode limitar CPU
+- Use modo "Performance" se disponível
 
 3. DESATIVE LIMITADORES DE CPU:
-   # Ver frequência atual
-   cat /proc/cpuinfo | grep MHz
-   
-   # Configurar modo performance (requer root)
-   sudo cpupower frequency-set -g performance
+# Ver frequência atual
+cat /proc/cpuinfo | grep MHz
+
+# Configurar modo performance (requer root)
+sudo cpupower frequency-set -g performance
 
 4. REPITA OS TESTES se os resultados variarem muito
-   - Execute run_tests_local.sh 2-3 vezes
-   - Use a média dos tempos
+- Execute run_tests_local.sh 2-3 vezes
+- Use a média dos tempos
 
 5. SE MUITO RÁPIDO (< 10 segundos):
-   - Aumente max_iter de 20 para 30 ou 40
-   - Use K=15 ou K=20 em vez de K=10
-   
-   Edite o script:
-   gedit run_tests_local.sh
-   # Mude: MAX_ITER=20 para MAX_ITER=30
+- Aumente max_iter de 20 para 30 ou 40
+- Use K=15 ou K=20 em vez de K=10
+
+Edite o script:
+gedit run_tests_local.sh
+# Mude: MAX_ITER=20 para MAX_ITER=30
 
 ===============================================================================
 TROUBLESHOOTING
@@ -295,41 +295,41 @@ TROUBLESHOOTING
 
 PROBLEMA: "Cannot open file: mnist_train.csv"
 SOLUÇÃO: 
-  cd ~/projects/tp_paralela
-  ls mnist_train.csv
-  Se não existir, execute: ./download_mnist.sh
+cd ~/projects/tp_paralela
+ls mnist_train.csv
+Se não existir, execute: ./download_mnist.sh
 
 PROBLEMA: "mpirun: command not found"
 SOLUÇÃO: 
-  sudo apt install openmpi-bin libopenmpi-dev
+sudo apt install openmpi-bin libopenmpi-dev
 
 PROBLEMA: "-fopenmp: unrecognized option"
 SOLUÇÃO: 
-  Atualizar g++: sudo apt install g++-11
-  Verificar: g++ --version (deve ser 7.0+)
+Atualizar g++: sudo apt install g++-11
+Verificar: g++ --version (deve ser 7.0+)
 
 PROBLEMA: "Permission denied"
 SOLUÇÃO: 
-  chmod +x run_tests_local.sh download_mnist.sh
+chmod +x run_tests_local.sh download_mnist.sh
 
 PROBLEMA: Tempos muito rápidos (< 3 segundos sequencial)
 SOLUÇÃO: 
-  Aumentar dificuldade:
-  - MAX_ITER=30 ou 40
-  - K=15 ou 20
-  - Ou usar mnist_test.csv + mnist_train.csv concatenados
+Aumentar dificuldade:
+- MAX_ITER=30 ou 40
+- K=15 ou 20
+- Ou usar mnist_test.csv + mnist_train.csv concatenados
 
 PROBLEMA: MPI dá erro "localhost slots=0"
 SOLUÇÃO:
-  echo "localhost slots=12" > ~/hostfile
-  mpirun --hostfile ~/hostfile -np 2 ./kmeans_hybrid mnist_train.csv 10 20
+echo "localhost slots=12" > ~/hostfile
+mpirun --hostfile ~/hostfile -np 2 ./kmeans_hybrid mnist_train.csv 10 20
 
 PROBLEMA: CPU muito quente / throttling
 SOLUÇÃO:
-  - Limpar cooler do notebook
-  - Usar base refrigerada
-  - Reduzir número de testes simultâneos
-  - Esperar esfriar entre testes
+- Limpar cooler do notebook
+- Usar base refrigerada
+- Reduzir número de testes simultâneos
+- Esperar esfriar entre testes
 
 ===============================================================================
 CHECKLIST FINAL ANTES DA ENTREGA

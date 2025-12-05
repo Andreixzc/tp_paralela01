@@ -1,0 +1,40 @@
+Iniciando testes...
+
+========================================
+  Testando: CUDA
+========================================
+
+  Run 1/3...
+    Total: 6.086s | GPU: 6.019s | Transfer: 0.067s
+  Run 2/3...
+    Total: 6.100s | GPU: 6.034s | Transfer: 0.066s
+  Run 3/3...
+    Total: 7.038s | GPU: 6.970s | Transfer: 0.068s
+
+========================================
+  Calculando médias...
+========================================
+
+CUDA:
+  Tempo médio total:        6.408s
+  Tempo médio GPU:          6.341s
+  Tempo médio transferência: 0.067s
+
+========================================
+  Testes concluídos!
+========================================
+
+Resultados salvos em:
+  - results_gpu_20251203_075110.csv (CSV)
+  - results_gpu_20251203_075110.txt (log)
+
+========================================
+  Comparação CPU vs GPU
+========================================
+
+Tempo CPU Sequential: 10.722s
+
+CUDA speedup vs CPU Sequential: 1.67x
+
+Use Python para análise mais detalhada:
+  python3 compare_results.py

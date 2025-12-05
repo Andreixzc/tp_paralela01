@@ -1,0 +1,35 @@
+Project Cleanup Summary
+=======================
+
+Files Removed (11 total):
+- kmeans_cuda_backup.cu (backup CUDA version)
+- kmeans_cuda_optimized.cu (experimental optimization)
+- kmeans_cuda_gpu_reduce.cu (duplicate implementation)
+- kmeans_cuda_opt (compiled binary - redundant)
+- kmeans_cuda_gpu_reduce (compiled binary - redundant)
+- quick_test_cuda.sh (temporary test script)
+- test_small.csv (temporary test data)
+- results_gpu_20251203_073621.csv (old test results)
+- results_gpu_20251203_073621.txt (old test log)
+- GPU_PERFORMANCE_ANALYSIS.md (redundant analysis)
+- COMPLETE_COMPARISON.md (redundant comparison)
+- k-means.cpp (unrelated file)
+
+Files Cleaned (emotes removed):
+- README.MD
+- OPENMP_GPU_NOTE.txt
+- QUICK_START.txt
+- GUIA_TESTE_LOCAL.txt
+- run_gpu_tests.sh
+- Makefile
+
+Final Project Structure:
+- Core implementations: 5 files (sequential, omp, hybrid, cuda, omp_gpu)
+- Test scripts: 4 files
+- Documentation: 4 files
+- Results: 3 files (latest GPU test + comparison + CPU summary)
+- Data: 2 files (MNIST train + test)
+- Build: 1 Makefile
+- Utilities: 2 files (download script, comparison script)
+
+Total: 21 essential files (down from 32)

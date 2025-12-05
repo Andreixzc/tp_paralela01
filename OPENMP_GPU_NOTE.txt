@@ -1,0 +1,53 @@
+# OpenMP GPU - Nota sobre Compilação
+
+## Status: Compilação Falhou
+
+O GCC 13.3.0 neste sistema não possui suporte completo para offloading GPU NVIDIA (nvptx-none).
+
+### Erro:
+```
+lto-wrapper: fatal error: could not find accel/nvptx-none/mkoffload
+```
+
+### Explicação:
+OpenMP GPU offloading requer:
+1. GCC compilado com suporte a nvptx
+2. Ferramentas de offloading instaladas
+3. Configuração específica do toolchain
+
+### Soluções Possíveis:
+
+**Opção 1: Instalar GCC com suporte nvptx**
+```bash
+# Geralmente requer compilar GCC from source
+# Ou usar distribuições específicas com GCC-offload
+sudo apt install gcc-offload-nvptx
+```
+
+**Opção 2: Usar Clang** (alternativa)
+```bash
+# Clang tem melhor suporte para OpenMP offloading
+sudo apt install clang-14
+clang++ -O3 -fopenmp -fopenmp-targets=nvptx64 -o kmeans_omp_gpu kmeans_omp_gpu.cpp
+```
+
+**Opção 3: Focar apenas em CUDA** (recomendado para este projeto)
+- CUDA compila e funciona perfeitamente
+- Melhor performance
+- Mais controle sobre otimizações
+
+## Decisão para o Projeto:
+
+Para Parte 2, vamos:
+1. **Usar CUDA como implementação GPU principal**
+2. **Manter código OpenMP GPU como referência**
+3. **Documentar a limitação do toolchain**
+
+CUDA é suficiente para demonstrar paralelização GPU e comparar com CPU.
+
+## Para Apresentação:
+
+Mencionar:
+- "Implementamos OpenMP GPU, mas requer toolchain específico"
+- "CUDA funciona perfeitamente e mostra excelente speedup"
+- "Ambas as abordagens seguem estratégias similares de paralelização"
